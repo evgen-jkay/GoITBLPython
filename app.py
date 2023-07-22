@@ -8,6 +8,7 @@ import tkinter as tk
 from tkinter import messagebox
 import webbrowser
 
+# Українська локалізація
 try:
     locale.setlocale(locale.LC_TIME, 'uk_UA')
 except locale.Error:
@@ -17,6 +18,7 @@ except locale.Error:
 WINDOW_WIDTH = 1100
 WINDOW_HEIGHT = 650
 
+# Массив міст
 cities = ["Київ",
           "Одеса",
           "Львів",
@@ -33,10 +35,13 @@ ukrainian_month_names = [
 
 
 def fetch_data(city):
+    # Отримання даних та створення DataFrame
     url = f"https://uadata.net/work-positions/cities.json?o={city}"
     response = requests.get(url)
     data_json = response.json()
     data_frame = pd.DataFrame(data_json["data"])
+
+    # Підготовка даних
     data_frame["Дата"] = pd.to_datetime(data_frame["at"], format="%Y-%m-%d")
     data_frame["Вакансії"] = data_frame["val"].replace(0, np.nan).interpolate()
     data_frame.set_index("Дата", inplace=True)
@@ -45,6 +50,7 @@ def fetch_data(city):
 
 
 def plot_data(city):
+    # Побудова графіків
     data_frame = fetch_data(city)
 
     plt.figure(figsize=(10, 6))
@@ -59,6 +65,7 @@ def plot_data(city):
 
 
 def update_plot(*args):
+    # Зміна назви головного вікна
     selected_city = city_var.get()
     fig = plot_data(selected_city)
 
@@ -79,11 +86,11 @@ def change_language_ukrainian():
 
 def change_language_english():
     locale.setlocale(locale.LC_TIME, 'en-US')
-    messagebox.showinfo("Change Language", "Не працює.")
+    messagebox.showinfo("Change Language", "Не працює. \nОчікуємо обнови")
 
 
 def open_github():
-    webbrowser.open("https://github.com/evgen-jkay")
+    webbrowser.open("https://github.com/evgen-jkay/GoITBLPython")
 
 
 def open_goit():
@@ -103,7 +110,7 @@ def show_help():
     help_label = tk.Label(help_window, text=help_text, justify="left", padx=10, pady=10)
     help_label.pack()
 
-    github_button = tk.Button(help_window, text="GitHub", command=open_github, width=30)
+    github_button = tk.Button(help_window, text="GitHub repo.", command=open_github, width=30)
     github_button.pack(side=tk.LEFT, padx=5, pady=5)
 
     goit_button = tk.Button(help_window, text="GoIT", command=open_goit, width=30)
@@ -112,7 +119,7 @@ def show_help():
 
 if __name__ == "__main__":
     root = tk.Tk()
-    root.title("Вакансії у місті Київ")
+    root.title("Графік вакансій в Україні")
     root.geometry(f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}")
     root.configure(bg='#fff')
     root.resizable(width=False, height=False)
@@ -144,11 +151,17 @@ if __name__ == "__main__":
                        text=city,
                        variable=city_var,
                        value=city,
-                       bg='#fff').pack(side=tk.TOP, padx=5, pady=5, anchor=tk.W)
+                       bg='#fff').pack(side=tk.TOP,
+                                       padx=5,
+                                       pady=5,
+                                       anchor=tk.W)
 
     plt.gca().xaxis.set_major_formatter(plt.FuncFormatter(lambda index, _: ukrainian_month_names[int(index) - 1]))
     plot_frame = tk.Frame(root, bg='#fff')
-    plot_frame.grid(row=0, column=1, padx=5, pady=5)
+    plot_frame.grid(row=0,
+                    column=1,
+                    padx=5,
+                    pady=5)
 
     update_plot()
 
