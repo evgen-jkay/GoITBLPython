@@ -11,3 +11,9 @@
 ```commandline
 pip install -r requirements.txt
 ```
+
+### .py -> .exe
+
+```commandline
+pyinstaller --clean --onefile --noconsole main.py
+```
