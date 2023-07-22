@@ -1,7 +1,7 @@
 ## GoIT Battle Language Program
 
-> main.py - консольна версія
-> app.py - версія с GUI tkinter
+> app.py - консольна версія
+> main.py - версія с GUI tkinter
 
 ### Встановлення
 
