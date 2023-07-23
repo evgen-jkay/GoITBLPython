@@ -8,7 +8,7 @@ import pandas as pd
 import requests
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QCheckBox, QPushButton, \
-    QMessageBox, QLabel
+    QMessageBox
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 # Українська локалізація
@@ -26,11 +26,6 @@ cities = ["Київ",
           "Запоріжжя",
           "Тернопіль",
           "Кривий Ріг"]
-
-ukrainian_month_names = [
-    'січень', 'лютий', 'березень', 'квітень', 'травень', 'червень',
-    'липень', 'серпень', 'вересень', 'жовтень', 'листопад', 'грудень'
-]
 
 fig, ax = plt.subplots(figsize=(10, 6))
 canvas = None
@@ -98,25 +93,30 @@ def update_plot():
     main_window.setWindowTitle("Кількість вакансій у містах України")
 
 
+def style_button(button):
+    button.setStyleSheet("""
+            QPushButton {
+                background-color: #007bff;
+                color: white;
+                padding: 5px 15px;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: #0056b3;
+            }
+            QPushButton:pressed {
+                background-color: #003f80;
+            }
+        """)
+
+
 def change_language_ukrainian():
     locale.setlocale(locale.LC_TIME, 'uk-UA')
     # Create a custom QMessageBox with custom styling
     msg_box = QMessageBox(main_window)
+    style_button(msg_box)
     msg_box.setWindowTitle("Зміна мови")
     msg_box.setText("Мова змінена на Українську.")
-    # Apply custom stylesheet to the QMessageBox buttons
-    msg_box.setStyleSheet("QPushButton {"
-                          "    background-color: #007bff;"
-                          "    color: white;"
-                          "    padding: 5px 15px;"
-                          "    border-radius: 5px;"
-                          "}"
-                          "QPushButton:hover {"
-                          "    background-color: #0056b3;"
-                          "}"
-                          "QPushButton:pressed {"
-                          "    background-color: #003f80;"
-                          "}")
 
     msg_box.exec_()
 
@@ -125,21 +125,9 @@ def change_language_english():
     locale.setlocale(locale.LC_TIME, 'en-US')
 
     msg_box = QMessageBox(main_window)
+    style_button(msg_box)
     msg_box.setWindowTitle("Change Language")
     msg_box.setText("Не працює. \nОчікуємо обнови")
-
-    msg_box.setStyleSheet("QPushButton {"
-                          "    background-color: #007bff;"
-                          "    color: white;"
-                          "    padding: 5px 15px;"
-                          "    border-radius: 5px;"
-                          "}"
-                          "QPushButton:hover {"
-                          "    background-color: #0056b3;"
-                          "}"
-                          "QPushButton:pressed {"
-                          "    background-color: #003f80;"
-                          "}")
 
     msg_box.exec_()
 
@@ -159,23 +147,25 @@ def show_help():
                 "Зробленна в рамках Битви мов программування GoIT."
 
     msg_box = QMessageBox(main_window)
+    style_button(msg_box)
     msg_box.setWindowTitle("Довідка")
     msg_box.setText(help_text)
 
-    msg_box.setStyleSheet("QPushButton {"
-                          "    background-color: #007bff;"
-                          "    color: white;"
-                          "    padding: 5px 15px;"
-                          "    border-radius: 5px;"
-                          "}"
-                          "QPushButton:hover {"
-                          "    background-color: #0056b3;"
-                          "}"
-                          "QPushButton:pressed {"
-                          "    background-color: #003f80;"
-                          "}")
-
     msg_box.exec_()
+
+
+class CustomFigureCanvas(FigureCanvas):
+    def __init__(self, *args, **kwargs):
+        FigureCanvas.__init__(self, *args, **kwargs)
+        self.setParent(None)
+
+
+class CanvasContainer(QWidget):
+    def __init__(self, canvas):
+        super().__init__()
+        layout = QVBoxLayout()
+        layout.addWidget(canvas)
+        self.setLayout(layout)
 
 
 if __name__ == "__main__":
@@ -184,12 +174,12 @@ if __name__ == "__main__":
     # Set the style for the application
     app.setStyleSheet("""
         QMenu::item:selected {
-            background-color: transparent;
+            background-color: #e6e6e6;
             color: black;
         }
 
         QMenu::item:pressed {
-            background-color: transparent;
+            background-color: #c6c6c6;
             color: black;
         }
     """)
@@ -219,34 +209,12 @@ if __name__ == "__main__":
 
     # Add buttons to the button layout
     github_button = QPushButton("GitHub")
-    github_button.setStyleSheet("QPushButton {"
-                                "    background-color: #007bff;"
-                                "    color: white;"
-                                "    padding: 5px 15px;"
-                                "    border-radius: 5px;"
-                                "}"
-                                "QPushButton:hover {"
-                                "    background-color: #0056b3;"
-                                "}"
-                                "QPushButton:pressed {"
-                                "    background-color: #003f80;"
-                                "}")
+    style_button(github_button)
     github_button.clicked.connect(open_github)
     button_layout.addWidget(github_button)
 
     goit_button = QPushButton("GoIT")
-    goit_button.setStyleSheet("QPushButton {"
-                              "    background-color: #007bff;"
-                              "    color: white;"
-                              "    padding: 5px 15px;"
-                              "    border-radius: 5px;"
-                              "}"
-                              "QPushButton:hover {"
-                              "    background-color: #0056b3;"
-                              "}"
-                              "QPushButton:pressed {"
-                              "    background-color: #003f80;"
-                              "}")
+    style_button(goit_button)
     goit_button.clicked.connect(open_goit)
     button_layout.addWidget(goit_button)
 
@@ -265,13 +233,11 @@ if __name__ == "__main__":
     help_menu.addAction("Про програму", show_help)
 
     # Створення виджету для відображення графіка
-    canvas = FigureCanvas(fig)
+    canvas = CustomFigureCanvas(fig)
 
-    canvas_widget = QWidget()
-    canvas_layout = QVBoxLayout(canvas_widget)
-    canvas_layout.addWidget(canvas)
-
-    main_layout.addWidget(canvas_widget)
+    # Create the container for the canvas
+    canvas_container = CanvasContainer(canvas)
+    main_layout.addWidget(canvas_container)
 
     main_widget = QWidget()
     main_widget.setLayout(main_layout)

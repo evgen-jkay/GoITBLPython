@@ -2,7 +2,7 @@
 
 > app.py - консольна версія
 > 
-> main.py - версія с GUI tkinter
+> main.py - версія с GUI
 
 ### Встановлення
 
