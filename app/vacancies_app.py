@@ -1,3 +1,4 @@
+import platform
 import locale
 import webbrowser
 import requests
@@ -11,11 +12,19 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from .canvas_widget import CustomFigureCanvas, CanvasContainer
 from .styles import style_button
 
+
 # Українська локалізація
-try:
-    locale.setlocale(locale.LC_TIME, 'uk_UA')
-except locale.Error:
-    locale.setlocale(locale.LC_TIME, 'Ukrainian_Ukraine')
+# Визначте операційну систему та встановіть відповідно локаль
+if platform.system() == 'Linux':
+    try:
+        locale.setlocale(locale.LC_TIME, 'uk_UA.UTF-8')
+    except locale.Error:
+        locale.setlocale(locale.LC_TIME, 'uk_UA')
+elif platform.system() == 'Windows':
+    try:
+        locale.setlocale(locale.LC_TIME, 'Ukrainian_Ukraine.1251')
+    except locale.Error:
+        locale.setlocale(locale.LC_TIME, 'Ukrainian_Ukraine')
 
 
 class VacanciesApp(QMainWindow):
@@ -153,20 +162,19 @@ class VacanciesApp(QMainWindow):
         self.setWindowTitle("Кількість вакансій у містах України")
 
     def change_language_ukrainian(self):
+        language_ukrainian_text = "Мова змінена на Українську."
         locale.setlocale(locale.LC_TIME, 'uk-UA')
-        # Create a custom QMessageBox with custom styling
         msg_box = QMessageBox(self)
-        style_button(msg_box)
         msg_box.setWindowTitle("Зміна мови")
-        msg_box.setText("Мова змінена на Українську.")
+        msg_box.setText(language_ukrainian_text)
         msg_box.exec_()
 
     def change_language_english(self):
+        language_english_text = "Не працює. \n\nОчікуємо обнови."
         locale.setlocale(locale.LC_TIME, 'en-US')
         msg_box = QMessageBox(self)
-        style_button(msg_box)
         msg_box.setWindowTitle("Change Language")
-        msg_box.setText("Не працює. \nОчікуємо обнови.")
+        msg_box.setText(language_english_text)
         msg_box.exec_()
 
     @staticmethod
